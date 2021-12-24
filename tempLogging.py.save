@@ -1,0 +1,132 @@
+\green153\blue2;\red219\green39\blue218;}
+{\*\expandedcolortbl;;\cssrgb\c83898\c28665\c18024;\csgray\c0;\cssrgb\c25544\c77008\c82022;
+\cssrgb\c25704\c77963\c19556;\cssrgb\c0\c65000\c0;\cssrgb\c89513\c29738\c88483;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\b\fs22 \cf2 \CocoaLigature0 ################################!/usr/bin/python3
+\f1\b0 \cf3 \
+\
+\
+
+\f0\b \cf4 import
+\f1\b0 \cf3  gspread\
+
+\f0\b \cf4 import
+\f1\b0 \cf3  random\
+
+\f0\b \cf4 import
+\f1\b0 \cf3  time\
+
+\f0\b \cf4 import
+\f1\b0 \cf3  Adafruit_DHT\
+
+\f0\b \cf4 import
+\f1\b0 \cf3  pytz\
+
+\f0\b \cf4 from
+\f1\b0 \cf3  datetime 
+\f0\b \cf4 import
+\f1\b0 \cf3  datetime\
+\
+
+\f0\b \cf5 ''' To run this file indefinately run
+\f1\b0 \cf3 \
+
+\f0\b \cf5     nohop python openSheet.py
+\f1\b0 \cf3 \
+
+\f0\b \cf5 '''
+\f1\b0 \cf3 \
+
+\f0\b \cf2 #google sheets authentication and loading worksheet in file.
+\f1\b0 \cf3 \
+gs = gspread.service_account()\
+sh = gs.open(
+\f0\b \cf5 "TemperatureLogging"
+\f1\b0 \cf3 )\
+worksheet = sh.sheet1\
+\
+\
+
+\f0\b \cf2 #gets value form a single cell
+\f1\b0 \cf3 \
+
+\f0\b \cf2 # for now the place where the last updated cell is in "C2"
+\f1\b0 \cf3 \
+lastUpdatedCell = 0\
+timeStamp = 0\cb6  \cb1 \
+
+\f0\b \cf4 while
+\f1\b0 \cf3  
+\f0\b \cf7 True
+\f1\b0 \cf3 :\
+   
+\f0\b \cf2  #getting now
+\f1\b0 \cf3 \cb6  \cb1 \
+    now = datetime.now(tz=pytz.utc)\
+    denverNow = now.astimezone(pytz.timezone(
+\f0\b \cf5 'US/Mountain'
+\f1\b0 \cf3 ))\
+\
+   
+\f0\b \cf2  #getting temperature reading\
+
+\f1\b0 \cf3 humidity, temperature = Adafruit_DHT.read_retry(11,4)\
+    humidity = 
+\f0\b \cf5 '%.2f'
+\f1\b0 \cf3 %(humidity)\
+    temperature = 
+\f0\b \cf5 '%.2f'
+\f1\b0 \cf3 %(temperature)\
+\
+   
+\f0\b \cf2  #get last updated value
+\f1\b0 \cf3 \
+    lucplace = 
+\f0\b \cf5 'D2'
+\f1\b0 \cf3 \
+    lastUpdatedCell = worksheet.acell(lucplace).value\
+    lastUpdatedCell = int(lastUpdatedCell) + 1\
+    lastUpdatedCell = str(lastUpdatedCell)\
+\
+
+\f0\b \cf5 '''update cells'''
+\f1\b0 \cf3 \
+    worksheet.update(
+\f0\b \cf5 'A'
+\f1\b0 \cf3 + lastUpdatedCell, str(denverNow.date()))           
+\f0\b \cf2  #u
+\f1\b0 \cf3 $\
+    worksheet.update(
+\f0\b \cf5 'B'
+\f1\b0 \cf3 + lastUpdatedCell, str(denverNow.strftime(
+\f0\b \cf5 '%H:%M'
+\f1\b0 \cf3 )))
+\f0\b \cf2  #u
+\f1\b0 \cf3 $\
+    worksheet.update(
+\f0\b \cf5 'C'
+\f1\b0 \cf3 + lastUpdatedCell, str(temperature))                
+\f0\b \cf2  #u
+\f1\b0 \cf3 $\
+   
+\f0\b \cf2  #print what has been done
+\f1\b0 \cf3 \
+    
+\f0\b \cf4 print 
+\f1\b0 \cf3 (
+\f0\b \cf5 'added'
+\f1\b0 \cf3  + str(denverNow.date()) + 
+\f0\b \cf5 ' and '
+\f1\b0 \cf3  + str(temperature))\
+\
+   
+\f0\b \cf2  #update last updated cell
+\f1\b0 \cf3 \
+    worksheet.update(lucplace,lastUpdatedCell)\
+\
+   
+\f0\b \cf2  #sleeping
+\f1\b0 \cf3 \cb6  \cb1 \
+    time.sleep(300)}
